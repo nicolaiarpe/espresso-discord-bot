@@ -10,6 +10,28 @@ Discord.login(process.env.DISCORD_TOKEN);
 // When the bot is logged in and ready
 Discord.on("ready", () => {
    console.log(`Logged in as ${Discord.user.tag}!`);
+
+   Discord.guilds.array().forEach(guild => {
+      console.log(guild.name);
+
+      // Check to see if guild has live role
+      const liveRoleID = Data.getLiveRoleID(guild.id);
+
+      // If the guild has a live role
+      if (liveRoleID) {
+         // Loop through all members and see if they are live
+         guild.members.array().forEach(member => {
+            const isLive = Helpers.isMemberLive(member);
+            const hasLiveRole = member.roles.find("id", liveRoleID);
+
+            if (isLive && !hasLiveRole) {
+               Helpers.handlePromise(member.addRole(liveRoleID));
+            } else if (!isLive && hasLiveRole) {
+               Helpers.handlePromise(member.removeRole(liveRoleID));
+            }
+         });
+      }
+   });
 });
 
 // On chat message
