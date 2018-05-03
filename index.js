@@ -4,8 +4,6 @@ const Discord = new DiscordJS.Client();
 const Data = require("./modules/data");
 const Helpers = require("./modules/helpers");
 
-console.log(Data.getLiveRole("303646995300745218"));
-
 // Login to Discord with bot token
 Discord.login(process.env.DISCORD_TOKEN);
 
@@ -17,6 +15,10 @@ Discord.on("ready", () => {
 // On chat message
 Discord.on("message", message => {
    console.log("messages was sent");
+});
+
+Discord.on("error", error => {
+   console.log(error);
 });
 
 // When a users status changes (i.e. away, idle, busy)
@@ -40,9 +42,11 @@ Discord.on("presenceUpdate", (oldMember, newMember) => {
       return false;
    } else if (!wasLive && isLive) {
       // Was not live, is live now
-      newMember.addRole(liveRoleID, "User went live!");
+      Helpers.handlePromise(newMember.addRole(liveRoleID, "User went live!"));
    } else if (wasLive && !isLive) {
       // Was live, is not live now
-      newMember.removeRole(liveRoleID, "User ended their stream!");
+      Helpers.handlePromise(
+         newMember.removeRole(liveRoleID, "User ended their stream!")
+      );
    }
 });

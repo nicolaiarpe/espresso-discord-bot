@@ -8,5 +8,10 @@ module.exports = {
          return true;
       }
       return false;
+   },
+   handlePromise: promise => {
+      promise.catch(e => {
+         console.log(e);
+      });
    }
 };
